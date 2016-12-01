@@ -87,6 +87,7 @@ class TFIDF(object):
         for token in t.tokenize(text):
             if cls.goi_filter(token):
                 goi_counter += 1
+                print token
 
             if '名詞' not in token.part_of_speech:
                 continue
@@ -174,13 +175,14 @@ class TFIDF(object):
 
 
 def main():
-    p2 = ["./data/narou/{}.txt".format(x) for x in range(1, 6)]
+    p2 = ["./data/ginga/gg{}.txt".format(x) for x in range(0, 11)]
 
-    for i in range(0, 5):
+    for i in range(1, 10):
         with codecs.open(p2[i], mode='r', encoding='utf8') as f:
             body = b''
             for x in f.readlines():
                 body += x
+            print "-----------------"
             print len(body), p2[i]
             tfidf_pair = TFIDF.gen(body)
             # for k, v in tfidf_pair:
