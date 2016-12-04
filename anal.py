@@ -69,6 +69,7 @@ class TFIDF(object):
         base_tfidf = cls.gen_web(base_url)
         return [[title, url, cls.similarity(base_tfidf, cls.gen_web(url))] for title, url in data]
 
+
     @classmethod
     def analysis(cls, text, enable_one_char):
         """
@@ -84,9 +85,12 @@ class TFIDF(object):
 
         # 形態素解析
         goi_counter = 0
+        k_counter = 0
+        goi_dict = defaultdict(int)
         for token in t.tokenize(text):
             if cls.goi_filter(token):
-                goi_counter += 1
+                k_counter += 1
+                goi_dict[token.surface] += 1
 
             if '名詞' not in token.part_of_speech:
                 continue
@@ -105,10 +109,11 @@ class TFIDF(object):
                 if len(token.surface) == 1:
                     continue
 
+            goi_counter += 1
             result[token.surface] += 1
             result2[token.surface] = token
 
-        print "語彙力:{} / {}".format(float(goi_counter) / float(count), goi_counter)
+        print "語彙力:{} / {}".format(float(len(goi_dict.keys())) / float(k_counter + count), goi_counter)
         # TF-IDF計算
         result3 = []
         for key in result:
@@ -120,7 +125,6 @@ class TFIDF(object):
             # print r[0], float(float(r[1])/float(count)), result2[r[0]]
             result4.append([r[0], float(float(r[1])/float(count))])
         return result4
-
 
     @classmethod
     def goi_filter(cls, token):
@@ -174,9 +178,18 @@ class TFIDF(object):
 
 
 def main():
-    p2 = ["./data/narou/{}.txt".format(x) for x in range(1, 6)]
+    novel_keys = [
+        'N6316BN.txt',
+        'N9669BK.txt',
+        'N8802BQ.txt',
+        'N7975CR.txt',
+        'N6768BF.txt',
+        'N7031BS.txt',
+        'N3726BT.txt',
+    ]
+    p2 = ["./narou_data/novel/{}".format(x) for x in novel_keys]
 
-    for i in range(0, 5):
+    for i in range(5, 7):
         with codecs.open(p2[i], mode='r', encoding='utf8') as f:
             body = b''
             for x in f.readlines():

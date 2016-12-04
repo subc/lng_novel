@@ -160,48 +160,25 @@ def yaml_read(filepath):
 
 
 def main():
-    # 銀河鉄道の夜
-    path_night_of_milky = './data/ao2/3.txt'
-    body_night_of_milky = file_read(path_night_of_milky)
-    tfidf_night_of_milky = TFIDF.gen(body_night_of_milky)
-    
-    # 'N1194BB.txt'
-    key1 = 'N1194BB.txt'
-    novel_path = './narou_data/novel/' + key1
-    novel_body = file_read(novel_path)
-    novel_tfidf = TFIDF.gen(novel_body)
+    novel_keys = [
+        'N1194BB.txt',
+        'N0624BK.txt',
+        'N0152CN.txt',
+        'N2679BO.txt',
+        'N1238DE.txt',
+    ]
 
-    #
-    for k, v in novel_tfidf:
-        print k
-    raise
+    result_tfidf = defaultdict(int)
+    for key in novel_keys:
+        novel_path = './narou_data/novel/' + key
+        novel_body = file_read(novel_path)
+        for key, point in TFIDF.gen(novel_body):
+            result_tfidf[key] += float(point)
 
-    # 重複していない形容詞をリストアップする
-    non_overlap_attribute = []
-    attributes_night_of_milky = [_[0] for _ in tfidf_night_of_milky]
-    for k, v in novel_tfidf:
-        if k not in attributes_night_of_milky:
-            non_overlap_attribute.append(k)
-            print k
-
-    print "*******************"
-
-
-    raise
-
-
-    keys = [key_night_of_milky, key_1]
-    tokenizer = TFIDF._get_tokenizer()
-    for key in keys:
-        print "*******************"
-        print key
-        print "*******************"
-        for record in tfidf_data[key]:
-            keyword, value = record
-            print keyword, value,
-            for _ in tokenizer.tokenize(keyword):
-                print _
-
+    # 合計する
+    sorted_result = sorted(result_tfidf.items(), key=lambda x: x[1], reverse=True)
+    for key, point in sorted_result:
+        print key, point
 
 
 

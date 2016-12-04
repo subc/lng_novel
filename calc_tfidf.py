@@ -165,6 +165,8 @@ def main():
         result = TFIDF.similarity(tfidf_night_of_milky_way_train, tfidf_data[key])
         print '銀河鉄道の夜 : {} の文章類似度: {}'.format(key, result)
 
+
+    raise
     # デバッグ用データ
     keys = [key_night_of_milky, 'N0035U.txt']
     tokenizer = TFIDF._get_tokenizer()
