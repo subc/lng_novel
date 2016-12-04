@@ -20,21 +20,6 @@ class TFIDF(object):
         """
         _text = cls.filter(text)
         return cls.analysis(_text, enable_one_char=enable_one_char)
-    #
-    # @classmethod
-    # def gen_web(cls, url, enable_one_char=False):
-    #     """
-    #     Get TF-IDF from url
-    #     :param url: str
-    #     :rtype: list[list[str, float]]
-    #     """
-    #     # HTTP GET
-    #     response = requests.get(url)
-    #
-    #     # filter HTTP Tag
-    #     soup = BeautifulSoup(response.text, "lxml")
-    #     text = soup.title.name + soup.get_text()
-    #     return cls.gen(text, enable_one_char=enable_one_char)
 
     @classmethod
     def similarity(cls, tfidf1, tfidf2):
@@ -85,16 +70,16 @@ class TFIDF(object):
 
         # 形態素解析
         goi_counter = 0
-        k_counter = 0
         goi_dict = defaultdict(int)
         for token in t.tokenize(text):
             if cls.goi_filter(token):
-                k_counter += 1
+                goi_counter += 1
                 goi_dict[token.surface] += 1
 
             if '名詞' not in token.part_of_speech:
                 continue
             count += 1
+            goi_counter += 1
 
             if '非自立' in token.part_of_speech:
                 continue
@@ -109,11 +94,10 @@ class TFIDF(object):
                 if len(token.surface) == 1:
                     continue
 
-            goi_counter += 1
             result[token.surface] += 1
             result2[token.surface] = token
 
-        print "語彙力:{} / {}".format(float(len(goi_dict.keys())) / float(k_counter + count), goi_counter)
+        print "語彙力:{} / {}".format(float(len(goi_dict.keys())) / float(goi_counter), goi_counter)
         # TF-IDF計算
         result3 = []
         for key in result:
@@ -158,15 +142,8 @@ class TFIDF(object):
         text = re.sub(r'[\n|\r|\t|年|月|日]', b'', text)
 
         # 日本語以外の文字を排除(韓国語とか中国語とかヘブライ語とか)
-        # jp_chartype_tokenizer = nltk.RegexpTokenizer(r'([ぁ-んー]+|[ァ-ンー]+|[\u4e00-\u9FFF]+|[ぁ-んァ-ンー\u4e00-\u9FFF]+)')
-        # print jp_chartype_tokenizer.tokenize("あいうえ hogehoge かきくけこ")
-        # print jp_chartype_tokenizer.tokenize("あいうえかきくけ")
-        # print ''.join(jp_chartype_tokenizer.tokenize("あいうえかきくけ"))
-        # print text
-        # print len(text)
-        # print len(jp_chartype_tokenizer.tokenize(text))
-        # text2 = ''.join(jp_chartype_tokenizer.tokenize(text))
-
+        jp_chartype_tokenizer = nltk.RegexpTokenizer(r'([ぁ-んー]+|[ァ-ンー]+|[\u4e00-\u9FFF]+|[ぁ-んァ-ンー\u4e00-\u9FFF]+)')
+        text = ''.join(jp_chartype_tokenizer.tokenize(text))
         return text
 
     @classmethod
@@ -187,18 +164,16 @@ def main():
         'N7031BS.txt',
         'N3726BT.txt',
     ]
-    p2 = ["./narou_data/novel/{}".format(x) for x in novel_keys]
+    novels_path = ["./narou_data/novel/{}".format(x) for x in novel_keys]
 
-    for i in range(5, 7):
-        with codecs.open(p2[i], mode='r', encoding='utf8') as f:
+    for i in range(0, len(novel_keys)):
+        with codecs.open(novels_path[i], mode='r', encoding='utf8') as f:
+            print "-----------------"
             body = b''
             for x in f.readlines():
                 body += x
-            print len(body), p2[i]
-            tfidf_pair = TFIDF.gen(body)
-            # for k, v in tfidf_pair:
-            #     print k, v
+            print len(body), novels_path[i]
+            print "TF-IDF: {}".format(TFIDF.gen(body))
 
 if __name__ == '__main__':
     main()
-
