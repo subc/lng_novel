@@ -173,7 +173,7 @@ def main():
             for x in f.readlines():
                 body += x
             print len(body), novels_path[i]
-            print "TF-IDF: {}".format(TFIDF.gen(body))
+            tfidf = TFIDF.gen(body)
 
 if __name__ == '__main__':
     main()
